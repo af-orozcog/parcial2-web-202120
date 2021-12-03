@@ -5,9 +5,19 @@ export const Chart = ({ width = 600, height = 600, data }) => {
   const barChart = useRef();
 
   useEffect(() => {
+    const type = (d) =>{
+      d.stock = +d.stock;
+      return d;
+    }
+
     const margin = { top: 10, left: 50, bottom: 40, right: 10 };
     const iwidth = width - margin.left - margin.right;
     const iheight = height - margin.top - margin.bottom;
+
+    var div = d3.select("#chartArea").append("div")
+      .attr("class", "tooltip")
+      .style("opacity",0);
+
 
     const svg = d3.select(barChart.current);
     svg.attr('width', width);
@@ -25,8 +35,34 @@ export const Chart = ({ width = 600, height = 600, data }) => {
       .range([0, iwidth])
       .padding(0.1);
 
-    // Continue with implementation. Don't forget the tooltip
-  });
+    const bars = g.selectAll("rect").data(data);
+
+    bars.enter().append("rect")
+      .attr("class", "bar")
+      .style("fill", "steelblue")
+      .attr("x", d => x(d.name))
+      .attr("y", d => y(d.stock))
+      .attr("height", d => iheight - y(d.stock))
+      .attr("width", x.bandwidth())
+      .on("mouseover",  (event,d) => {
+          div.style("opacity", .9);
+        div	.html(d.name + " " + d.stock)
+          .style("left", (event.pageX) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", (event,d) => {
+        div.style("opacity", 0);
+      })
+
+    g.append("g")
+      .classed("x--axis", true)
+      .call(d3.axisBottom(x))
+      .attr("opacity", 0)
+
+    g.append("g")
+      .classed("y--axis", true)
+      .call(d3.axisLeft(y));
+  },[data]);
 
   return (
     <div id='chartArea'>
