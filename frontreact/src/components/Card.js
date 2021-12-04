@@ -15,7 +15,7 @@ export const Card = (props) => {
   }
 
   return (
-    <div classname='card'>
+    <div className='card'>
       <div className={getClassName(isActive)}>
         <div className='card-header'>
           <p className='card-title'>{name}</p>
